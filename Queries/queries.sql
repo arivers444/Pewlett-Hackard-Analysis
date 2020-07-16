@@ -248,6 +248,8 @@ FROM current_emp as ce
 WHERE d.dept_no IN ('d007', 'd005');
 SELECT * FROM sales_and_dev_team_info;
 
+
+
 -- Challenge
 -- Create table to find job title names.
 SELECT COUNT(e.emp_no),
@@ -257,6 +259,7 @@ FROM employees as e
 	INNER JOIN titles as t
 		ON e.emp_no = t.emp_no
 GROUP BY t.title;
+SELECT * FROM number_of_titles;
 
 -- Create a table containing the number of employees about to retire grouped by job title.
 SELECT e.emp_no,
@@ -264,6 +267,7 @@ SELECT e.emp_no,
 	e.last_name,
 	t.title,
 	t.from_date,
+	t.to_date,
 	s.salary
 INTO retire_by_title 
 FROM employees as e
@@ -272,5 +276,48 @@ FROM employees as e
 	INNER JOIN salaries AS s
 		ON (e.emp_no = s.emp_no)
 WHERE (e.birth_date BETWEEN '1952-01-01' AND '1955-12-31')
-AND t.title IN ('Assistant Engineer', 'Engineer', 'Manager', 'Senior Engineer', 'Senior Staff', 'Staff', 'Technique Leader');
+AND t.title IN ('Assistant Engineer', 'Engineer', 'Manager', 'Senior Engineer', 'Senior Staff', 'Staff', 'Technique Leader')
+ORDER BY emp_no;
+-- Query the table.
+SELECT * FROM retire_by_title;
 
+-- Partition the data to show only most recent title per employee.
+SELECT emp_no, first_name, last_name, title, from_date, salary
+INTO future_retirees_by_title
+FROM 
+(SELECT emp_no, first_name, last_name, title, from_date, to_date, salary, 
+ ROW_NUMBER() OVER
+ (PARTITION BY (emp_no)
+ ORDER BY to_date DESC) rn
+ FROM retire_by_title) tmp 
+ WHERE rn = 1
+ORDER BY title;
+-- Query the table.
+SELECT * FROM future_retirees_by_title;
+
+-- Create table showing mentorship eligibility.
+SELECT e.emp_no,
+	e.first_name,
+	e.last_name,
+	t.title,
+	t.from_date,
+	t.to_date
+INTO mentor_eligibility 
+FROM employees as e
+	INNER JOIN titles AS t
+		ON (e.emp_no = t.emp_no)
+WHERE (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31');
+SELECT * FROM mentor_eligibility;
+
+-- Partition the data to show only most recent title per employee.
+SELECT emp_no, first_name, last_name, title, from_date, to_date
+INTO mentorship_eligibility
+FROM 
+(SELECT emp_no, first_name, last_name, title, from_date, to_date,  
+ ROW_NUMBER() OVER
+ (PARTITION BY (emp_no)
+ ORDER BY to_date DESC) rn
+ FROM mentor_eligibility) tmp 
+ WHERE rn = 1
+ORDER BY emp_no;
+SELECT * FROM mentorship_eligibility;
