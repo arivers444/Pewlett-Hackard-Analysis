@@ -4,6 +4,8 @@
 - In your first paragraph, introduce the problem that you were using data to solve.
 
 ## Solving the Problem
+- Insert ERD png
+
 ### Steps
 - In your second paragraph, summarize the steps that you took to solve the problem, as well as the 
 ### Challenges
