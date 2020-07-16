@@ -295,6 +295,15 @@ ORDER BY title;
 -- Query the table.
 SELECT * FROM future_retirees_by_title;
 
+-- Show total number of employees retiring by title.
+SELECT COUNT(frbt.emp_no),
+	frbt.title
+INTO num_future_retirees_by_title
+FROM future_retirees_by_title as frbt
+GROUP BY frbt.title;
+-- Query the table.
+SELECT * FROM num_future_retirees_by_title;
+
 -- Create table showing mentorship eligibility.
 SELECT e.emp_no,
 	e.first_name,
@@ -321,3 +330,10 @@ FROM
  WHERE rn = 1
 ORDER BY emp_no;
 SELECT * FROM mentorship_eligibility;
+
+-- Show total number of employees available for mentoring role.
+SELECT COUNT(*)
+INTO num_mentorship_eligibility
+FROM mentorship_eligibility;
+-- Query the table.
+SELECT * FROM num_mentorship_eligibility;
